@@ -36,6 +36,9 @@ private:
 	class UDataTable* CharacterDataTable;
 	struct FUS_CharacterStats* CharacterStats;
 
+	UPROPERTY()
+	AActor* InteractableActor;
+
 public:
 	// Sets default values for this character's properties
 	AUS_Character();
@@ -49,6 +52,15 @@ protected:
 	void SprintStart(const  FInputActionValue& Value);
 	void SprintEnd(const  FInputActionValue& Value);
 	void Interact(const  FInputActionValue& Value);
+		   
+	UFUNCTION(Server, Reliable)
+	void Interact_Server();
+
+	UFUNCTION(Server, Reliable)
+	void SprintStart_Server();
+
+	UFUNCTION(Server, Reliable)
+	void SprintEnd_Server();			    
 
 public:
 	// Called every frame
