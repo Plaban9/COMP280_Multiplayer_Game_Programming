@@ -18,6 +18,9 @@ private:
 	UPROPERTY()
 	FVector PatrolLocation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Minion AI", meta = (AllowPrivateAccess = "true"))
+	float AlertRadius = 6000.0f;
+
 public:
 	// Sets default values for this character's properties
 	AUS_Minion();
@@ -45,10 +48,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume);
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Minion AI")
+	void GoToLocation(const FVector& Location);
 };

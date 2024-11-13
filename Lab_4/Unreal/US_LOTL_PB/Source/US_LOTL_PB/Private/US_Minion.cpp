@@ -10,6 +10,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/SphereComponent.h"
+#include "US_GameMode.h"
 
 // Sets default values
 AUS_Minion::AUS_Minion()
@@ -81,6 +82,7 @@ void AUS_Minion::PostInitializeComponents()
 	if (GetLocalRole() != ROLE_Authority) return;
 	OnActorBeginOverlap.AddDynamic(this, &AUS_Minion::OnBeginOverlap);
 	GetPawnSense()->OnSeePawn.AddDynamic(this, &AUS_Minion::OnPawnDetected);
+	GetPawnSense()->OnHearNoise.AddDynamic(this, &AUS_Minion::OnHearNoise);
 }
 
 void AUS_Minion::OnPawnDetected(APawn* Pawn)
@@ -115,5 +117,23 @@ void AUS_Minion::Chase(APawn* Pawn)
 	GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
 	UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), Pawn);
 	DrawDebugSphere(GetWorld(), Pawn->GetActorLocation(), 25.f, 12, FColor::Red, true, 10.f, 0, 2.f);
+
+	if (const auto GameMode = Cast<AUS_GameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GameMode->AlertMinions(this, Pawn->GetActorLocation(), AlertRadius);
+	}
+}
+
+void AUS_Minion::OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Noise detected!"));
+	GoToLocation(Location);
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), PatrolLocation);
+}
+
+void AUS_Minion::GoToLocation(const FVector& Location)
+{
+	PatrolLocation = Location;
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), PatrolLocation);
 }
 

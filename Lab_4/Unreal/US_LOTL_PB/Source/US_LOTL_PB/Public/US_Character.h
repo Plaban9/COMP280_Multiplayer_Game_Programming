@@ -39,6 +39,9 @@ private:
 	UPROPERTY()
 	AActor* InteractableActor;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stealth", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UPawnNoiseEmitterComponent> NoiseEmitter;
+
 public:
 	// Sets default values for this character's properties
 	AUS_Character();
@@ -52,7 +55,7 @@ protected:
 	void SprintStart(const  FInputActionValue& Value);
 	void SprintEnd(const  FInputActionValue& Value);
 	void Interact(const  FInputActionValue& Value);
-		   
+
 	UFUNCTION(Server, Reliable)
 	void Interact_Server();
 
@@ -60,7 +63,7 @@ protected:
 	void SprintStart_Server();
 
 	UFUNCTION(Server, Reliable)
-	void SprintEnd_Server();			    
+	void SprintEnd_Server();
 
 public:
 	// Called every frame

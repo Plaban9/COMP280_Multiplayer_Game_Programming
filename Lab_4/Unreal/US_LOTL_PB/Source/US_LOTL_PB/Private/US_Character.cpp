@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "US_CharacterStats.h"
 #include "Engine/DataTable.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 
 #include "US_Interactable.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -32,6 +33,9 @@ AUS_Character::AUS_Character()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitter"));
+	NoiseEmitter->NoiseLifetime = 0.01f;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -97,7 +101,15 @@ void AUS_Character::Tick(float DeltaTime)
 		InteractableActor = nullptr;
 	}
 
-
+	if (GetCharacterMovement()->MaxWalkSpeed == GetCharacterStats()->SprintSpeed)
+	{
+		auto Noise = 1.f;
+		if (GetCharacterStats() && GetCharacterStats()->StealthMultiplier)
+		{
+			Noise = Noise / GetCharacterStats()->StealthMultiplier;
+		}
+		NoiseEmitter->MakeNoise(this, Noise, GetActorLocation());
+	}
 }
 
 // Called to bind functionality to input
