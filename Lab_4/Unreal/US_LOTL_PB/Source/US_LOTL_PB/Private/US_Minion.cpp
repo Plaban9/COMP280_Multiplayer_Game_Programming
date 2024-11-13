@@ -11,6 +11,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/SphereComponent.h"
 #include "US_GameMode.h"
+#include "US_BasePickup.h"
 
 // Sets default values
 AUS_Minion::AUS_Minion()
@@ -46,6 +47,13 @@ AUS_Minion::AUS_Minion()
 	GetCharacterMovement()->MaxWalkSpeed = 200.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+
+	static ConstructorHelpers::FClassFinder<AUS_BasePickup>
+		SpawnedPickupAsset(TEXT("/Game/Blueprints/BP_GoldCoinPickup"));
+	if (SpawnedPickupAsset.Succeeded())
+	{
+		SpawnedPickup = SpawnedPickupAsset.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -83,6 +91,8 @@ void AUS_Minion::PostInitializeComponents()
 	OnActorBeginOverlap.AddDynamic(this, &AUS_Minion::OnBeginOverlap);
 	GetPawnSense()->OnSeePawn.AddDynamic(this, &AUS_Minion::OnPawnDetected);
 	GetPawnSense()->OnHearNoise.AddDynamic(this, &AUS_Minion::OnHearNoise);
+
+	OnTakeAnyDamage.AddDynamic(this, &AUS_Minion::OnDamage);
 }
 
 void AUS_Minion::OnPawnDetected(APawn* Pawn)
@@ -137,3 +147,16 @@ void AUS_Minion::GoToLocation(const FVector& Location)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), PatrolLocation);
 }
 
+void AUS_Minion::OnDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	Health -= Damage;
+
+	if (Health > 0) 
+		return;
+
+	if (SpawnedPickup)
+	{
+		GetWorld()->SpawnActor<AUS_BasePickup>(SpawnedPickup, GetActorLocation(), GetActorRotation());
+	}
+	Destroy();
+}

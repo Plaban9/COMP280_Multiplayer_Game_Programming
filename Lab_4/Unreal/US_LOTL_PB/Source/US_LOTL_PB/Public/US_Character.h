@@ -42,6 +42,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stealth", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPawnNoiseEmitterComponent> NoiseEmitter;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UUS_WeaponProjectileComponent> Weapon;
+
 public:
 	// Sets default values for this character's properties
 	AUS_Character();
@@ -79,4 +82,6 @@ public:
 	virtual void UpdateCharacterStats(int32 CharacterLevel);
 	//void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FUS_CharacterStats* GetCharacterStats() const { return CharacterStats; }
+
+	FORCEINLINE UUS_WeaponProjectileComponent* GetWeapon() const { return Weapon; }
 };
