@@ -61,7 +61,7 @@ void UUS_WeaponProjectileComponent::Throw()
 void UUS_WeaponProjectileComponent::Throw_Server_Implementation()
 {
 
-	if (ProjectileClass)
+	/*if (ProjectileClass)
 	{
 		const auto Character = Cast<AUS_Character>(GetOwner());
 		const auto ProjectileSpawnLocation = GetComponentLocation();
@@ -70,11 +70,39 @@ void UUS_WeaponProjectileComponent::Throw_Server_Implementation()
 		ProjectileSpawnParams.Owner = GetOwner();
 		ProjectileSpawnParams.Instigator = Character;
 		GetWorld()->SpawnActor<AUS_BaseWeaponProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation, ProjectileSpawnParams);
+	}*/
+
+	if (ProjectileClass)
+	{
+		Throw_Client();
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+			{
+				const auto Character = Cast<AUS_Character>(GetOwner());
+				const auto ProjectileSpawnLocation = GetComponentLocation();
+				const auto ProjectileSpawnRotation = GetComponentRotation();
+				auto ProjectileSpawnParams = FActorSpawnParameters();
+				ProjectileSpawnParams.Owner = GetOwner();
+				ProjectileSpawnParams.Instigator = Character;
+				GetWorld()->SpawnActor<AUS_BaseWeaponProjectile>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotation, ProjectileSpawnParams);
+			}, .4f, false);
 	}
 }
 
 void UUS_WeaponProjectileComponent::SetProjectileClass(TSubclassOf<AUS_BaseWeaponProjectile> NewProjectileClass)
 {
 	ProjectileClass = NewProjectileClass;
+}
+
+void UUS_WeaponProjectileComponent::Throw_Client_Implementation()
+{
+	const auto Character = Cast<AUS_Character>(GetOwner());
+	if (ThrowAnimation != nullptr)
+	{
+		if (const auto AnimInstance = Character->GetMesh()->GetAnimInstance(); AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(ThrowAnimation, 1.f);
+		}
+	}
 }
 

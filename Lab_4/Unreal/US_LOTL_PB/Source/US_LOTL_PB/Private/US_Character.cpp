@@ -42,6 +42,7 @@ AUS_Character::AUS_Character()
 	Weapon = CreateDefaultSubobject<UUS_WeaponProjectileComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(RootComponent);
 	Weapon->SetRelativeLocation(FVector(120.f, 70.f, 0.f));
+	Weapon->SetIsReplicated(true);
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -197,6 +198,7 @@ void AUS_Character::Interact_Server_Implementation()
 {
 	if (InteractableActor)
 	{
+		GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Purple, TEXT("Interaction with Actor"));
 		IUS_Interactable::Execute_Interact(InteractableActor, this);
 	}
 }
