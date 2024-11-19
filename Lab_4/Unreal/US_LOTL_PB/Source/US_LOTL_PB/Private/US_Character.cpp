@@ -136,7 +136,7 @@ void AUS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void AUS_Character::Move(const FInputActionValue& Value)
 {
 	const auto MovementVector = Value.Get<FVector2D>();
-	GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor::Yellow, FString::Printf(TEXT("MovementVecctor: %s"), *MovementVector.ToString()));
+	GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor::Yellow, FString::Printf(TEXT("MovementVector: %s"), *MovementVector.ToString()));
 
 	if (Controller != nullptr)
 	{
@@ -235,13 +235,32 @@ void AUS_Character::UpdateCharacterStats(int32 CharacterLevel)
 
 void AUS_Character::SprintStart_Server_Implementation()
 {
+	/*if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
+	}*/
+
+	SprintStart_Client();
+}
+
+void AUS_Character::SprintEnd_Server_Implementation()
+{
+	/*if (GetCharacterStats())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+	}*/
+	SprintEnd_Client();
+}
+
+void AUS_Character::SprintStart_Client_Implementation()
+{
 	if (GetCharacterStats())
 	{
 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
 	}
 }
 
-void AUS_Character::SprintEnd_Server_Implementation()
+void AUS_Character::SprintEnd_Client_Implementation()
 {
 	if (GetCharacterStats())
 	{

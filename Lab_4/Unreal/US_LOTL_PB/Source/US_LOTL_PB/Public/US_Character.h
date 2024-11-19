@@ -68,6 +68,11 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void SprintEnd_Server();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintStart_Client();
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintEnd_Client();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
